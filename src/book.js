@@ -344,6 +344,22 @@ class Book {
 	 * @return {Promise}     returns a promise with the requested resource
 	 */
 	load(path) {
+		// console.log('BOOK PATH', path);
+		if (path.includes('EMPTY_PAGE')) {
+			return new Promise((resolve) => {
+				try {
+					const doc = document.implementation.createHTMLDocument('hi');
+					const div = doc.createElement('div');
+					div.classList.add('inter-chapter-loader');
+					div.innerText = 'We are a blank page';
+					doc.body.appendChild(div);
+					resolve(doc);
+				} catch (e) {
+					console.log('ERRRRROR', e);
+				}
+			});
+		}
+
 		var resolved = this.resolve(path);
 		if(this.archived) {
 			return this.archive.request(resolved);

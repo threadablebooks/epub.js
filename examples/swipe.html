@@ -37,17 +37,7 @@
       flow: "paginated",
       width: "100%",
       height: "100%",
-      snap: {
-        duration: 200,
-        minVelocity: 0.4,
-        minDistance: 10,
-        easing(pos) {
-          if ((pos /= 0.5) < 1) {
-            return 0.5 * Math.pow(pos, 5);
-          }
-          return 0.5 * (Math.pow((pos - 2), 5) + 2);
-        },
-      }
+      snap: true
     });
 
     rendition.themes.fontSize('24px');

@@ -26,10 +26,10 @@ class Snap {
 	constructor(manager, options) {
 
     this.settings = extend({
-      duration: 350,
+      duration: 80,
       minVelocity: 0.2,
       minDistance: 10,
-			easing: EASING_EQUATIONS['easeOutSine'],
+      easing: EASING_EQUATIONS['easeInCubic'],
     }, options || {});
 
 		this.supportsTouch = this.supportsTouch();

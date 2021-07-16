@@ -11,7 +11,10 @@ class Path {
 	constructor(pathString) {
 		var protocol;
 		var parsed;
-
+		console.log('PATH', pathString);
+		if (pathString === 'EMPTY_PAGE') {
+			return;
+		}
 		protocol = pathString.indexOf("://");
 		if (protocol > -1) {
 			pathString = new URL(pathString).pathname;
