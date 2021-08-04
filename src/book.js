@@ -351,7 +351,7 @@ class Book {
 					const doc = document.implementation.createHTMLDocument('hi');
 					const div = doc.createElement('div');
 					div.classList.add('inter-chapter-loader');
-					div.innerText = 'We are a blank page';
+					div.innerText = '';
 					doc.body.appendChild(div);
 					resolve(doc);
 				} catch (e) {

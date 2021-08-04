@@ -55,7 +55,6 @@ class Spine {
 		this.items = interleave(this.items, { "idref": "empty_page", "linear": "yes", "properties": [], href: "EMPTY_PAGE" });
 
 		this.items.forEach( (item, index) => {
-			// console.log('item', JSON.stringify(item));
 			var manifestItem = this.manifest[item.idref];
 			var spineItem;
 
@@ -113,7 +112,6 @@ class Spine {
 			spineItem = new Section(item, this.hooks);
 
 			this.append(spineItem);
-			// console.log('item', item);
 
 		});
 

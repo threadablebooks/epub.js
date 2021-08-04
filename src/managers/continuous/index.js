@@ -5,11 +5,14 @@ import { EVENTS } from "../../utils/constants";
 import debounce from "lodash/debounce";
 import Section from "../../section";
 
+const EMPTY_PAGE_STRING = 'empty_page';
+
 class ContinuousViewManager extends DefaultViewManager {
 	constructor(options) {
 		super(options);
 
 		this.name = "continuous";
+		this.readingDirection = 'forward';
 
 		this.settings = extend(this.settings || {}, {
 			infinite: true,
@@ -105,7 +108,6 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	add(section){
-		console.log('we are adding a section!');
 		var view = this.createView(section);
 
 		this.views.append(view);
@@ -129,6 +131,75 @@ class ContinuousViewManager extends DefaultViewManager {
 		return view.display(this.request);
 	}
 
+	observeMovingBack(view) {
+		var observer = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting === true) {
+				setTimeout(() => {
+					const next = this.views.last().section.next();
+					if (next && !next.idref.includes(EMPTY_PAGE_STRING)) {
+						this.clear();
+
+						let forceRight = false;
+
+						return this.defaultAppend(next)
+							.then(() => {
+								return this.handleNextPrePaginated(forceRight, next, this.defaultAppend);
+							}, (err) => {
+								return err;
+							})
+							.then(() => {
+								this.views.show();
+								setTimeout(() => {
+									this.check();
+								}, 200);
+							});
+					}
+				}, 500);
+			}
+		}, { threshold: [1] });
+
+		observer.observe(view.element);
+	}
+
+	observeMovingForward(view) {
+		var observer = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting === true) {
+				setTimeout(() => {
+					const prev = this.views.first().section.prev();
+					if (prev && !prev.idref.includes(EMPTY_PAGE_STRING)) {
+						this.clear();
+
+						return this.defaultPrepend(prev)
+							.then(() => {
+								if (this.settings.axis === "horizontal") {
+									this.scrollTo(this.container.scrollWidth - this.layout.delta, 0, true);
+								}
+								this.views.show();
+								setTimeout(() => {
+									this.check();
+								}, 1200);
+							});
+					}
+				}, 500);
+			}
+		}, { threshold: [1] });
+
+		observer.observe(view.element);
+	}
+
+	afterDisplayed(view) {
+		if (view.section.idref.includes(EMPTY_PAGE_STRING)) {
+			// the logic
+			if (this.readingDirection === 'backward') {
+				this.observeMovingBack(view);
+			} else {
+				this.observeMovingForward(view);
+			}
+		} else {
+			this.emit(EVENTS.MANAGERS.ADDED, view);
+		}
+	}
+
 	defaultAppend(section, forceRight = false) {
 		var view = this.createView(section, forceRight);
 		this.views.append(view);
@@ -148,6 +219,7 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	append(section){
+		this.readingDirection = 'backward';
 		var view = this.createView(section);
 
 		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
@@ -163,51 +235,7 @@ class ContinuousViewManager extends DefaultViewManager {
 		});
 
 		this.views.append(view);
-
-		if (section.idref.includes('empty_page')) {
-			const onDisplay = () => {
-				var observer = new IntersectionObserver((entries) => {
-					if (entries[0].isIntersecting === true) {
-						setTimeout(() => {
-							const next = this.views.last().section.next();
-							if (next && !next.idref.includes('empty_page')) {
-								this.clear();
-
-								let forceRight = false;
-
-								return this.defaultAppend(next)
-									.then(() => {
-										return this.handleNextPrePaginated(forceRight, next, this.defaultAppend);
-									}, (err) => {
-										return err;
-									})
-									.then(() => {
-
-										// Reset position to start for scrolled-doc vertical-rl in default mode
-										// if (!this.isPaginated &&
-										// 	this.settings.axis === "horizontal" &&
-										// 	this.settings.direction === "rtl" &&
-										// 	this.settings.rtlScrollType === "default") {
-
-										// 	this.scrollTo(this.container.scrollWidth, 0, true);
-										// }
-										this.views.show();
-										setTimeout(() => {
-											this.check();
-										}, 200);
-									});
-							}
-						}, 500);
-					}
-				}, { threshold: [1] });
-
-				observer.observe(view.element);
-			};
-
-			view.onDisplayed = onDisplay.bind(this);
-		} else {
-			view.onDisplayed = this.afterDisplayed.bind(this);
-		}
+		view.onDisplayed = this.afterDisplayed.bind(this);
 
 		return view;
 	}
@@ -237,6 +265,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	prepend(section){
 		var view = this.createView(section);
+		this.readingDirection = 'forward';
 
 		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
 			this.counter(bounds);
@@ -253,38 +282,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		this.views.prepend(view);
 
-		if (section.idref.includes('empty_page')) {
-			const onDisplay = () => {
-				var observer = new IntersectionObserver((entries) => {
-					if (entries[0].isIntersecting === true) {
-						setTimeout(() => {
-							const prev = this.views.first().section.prev();
-							if (prev && !prev.idref.includes('empty_page')) {
-								this.clear();
-
-								return this.defaultPrepend(prev)
-									.then(() => {
-										if (this.settings.axis === "horizontal") {
-											this.scrollTo(this.container.scrollWidth - this.layout.delta, 0, true);
-										}
-										this.views.show();
-										setTimeout(() => {
-											this.check();
-										}, 1200);
-									});
-							}
-						}, 500);
-					}
-				}, { threshold: [1] });
-		
-				observer.observe(view.element);
-			};
-
-			view.onDisplayed = onDisplay.bind(this);
-		} else {
-			view.onDisplayed = this.afterDisplayed.bind(this);
-		}
-
+		view.onDisplayed = this.afterDisplayed.bind(this);
 		return view;
 	}
 
@@ -313,7 +311,6 @@ class ContinuousViewManager extends DefaultViewManager {
 			isVisible = this.isVisible(view, offset, offset, container);
 
 			if(isVisible === true) {
-				// console.log("visible " + view.index, view.displayed);
 
 				if (!view.displayed) {
 					let displayed = view.display(this.request)
@@ -329,7 +326,6 @@ class ContinuousViewManager extends DefaultViewManager {
 				visible.push(view);
 			} else {
 				this.q.enqueue(view.destroy.bind(view));
-				// console.log("hidden " + view.index, view.displayed);
 
 				clearTimeout(this.trimTimeout);
 				this.trimTimeout = setTimeout(function(){
@@ -393,15 +389,13 @@ class ContinuousViewManager extends DefaultViewManager {
 		}
 
 		let prepend = () => {
-			console.log('A PREPEND IS HAPPENING!!!');
 			let first = this.views.first();
 
-			if (first.section.idref.includes('empty_page')) {
+			if (first.section.idref.includes(EMPTY_PAGE_STRING)) {
 				return Promise.resolve();
 			}
 
 			let prev = first && first.section.prev();
-			console.log(prev);
 
 			if(prev) {
 				newViews.push(this.prepend(prev));
@@ -411,13 +405,11 @@ class ContinuousViewManager extends DefaultViewManager {
 		let append = () => {
 			let last = this.views.last();
 			let next = last && last.section.next();
-			// console.log('last', last);
-			if (last.section.idref.includes('empty_page')) {
+			if (last.section.idref.includes(EMPTY_PAGE_STRING)) {
 				return Promise.resolve();
 			}
 
 			if(next) {
-				console.log('appending a new page');
 				newViews.push(this.append(next));
 			}
 		};
@@ -425,9 +417,7 @@ class ContinuousViewManager extends DefaultViewManager {
 		let end = offset + visibleLength + delta;
 		let start = offset - delta;
 
-		console.log(end, contentLength);
 		if (end >= contentLength) {
-			console.log('we should be appending');
 			append();
 		}
 		
