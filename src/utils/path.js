@@ -11,8 +11,8 @@ class Path {
 	constructor(pathString) {
 		var protocol;
 		var parsed;
-		console.log('PATH', pathString);
-		if (pathString === 'EMPTY_PAGE') {
+
+		if (pathString.includes('EMPTY_PAGE')) {
 			return;
 		}
 		protocol = pathString.indexOf("://");

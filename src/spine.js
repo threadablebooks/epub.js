@@ -48,7 +48,7 @@ class Spine {
 
 		// this.items.push({ "idref": "empty_page", "linear": "yes", "properties": [], "index": this.items.length, href: "://" });
 		const interleave = (arr, thing) => [].concat(...arr.map((n, index) => {
-			const item = { ...thing, idref: `${thing.idref}_${index}` };
+			const item = { ...thing, idref: `${thing.idref}_${index}`, href: `${thing.href}_${index}` };
 			return [n, item];
 		})).slice(0, -1);
 
