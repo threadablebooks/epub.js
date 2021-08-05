@@ -100,9 +100,6 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	// Remove Previous Listeners if present
 	removeShownListeners(view){
-
-		// view.off("shown", this.afterDisplayed);
-		// view.off("shown", this.afterDisplayedAbove);
 		view.onDisplayed = function(){};
 
 	}
@@ -124,7 +121,6 @@ class ContinuousViewManager extends DefaultViewManager {
 			this.updateWritingMode(mode);
 		});
 
-		// view.on(EVENTS.VIEWS.SHOWN, this.afterDisplayed.bind(this));
 		view.onDisplayed = this.afterDisplayed.bind(this);
 		view.onResize = this.afterResized.bind(this);
 
@@ -189,7 +185,6 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	afterDisplayed(view) {
 		if (view.section.idref.includes(EMPTY_PAGE_STRING)) {
-			// the logic
 			if (this.readingDirection === 'backward') {
 				this.observeMovingBack(view);
 			} else {
@@ -219,7 +214,7 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	append(section){
-		this.readingDirection = 'backward';
+		this.readingDirection = 'forward';
 		var view = this.createView(section);
 
 		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
@@ -265,7 +260,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	prepend(section){
 		var view = this.createView(section);
-		this.readingDirection = 'forward';
+		this.readingDirection = 'backward';
 
 		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
 			this.counter(bounds);

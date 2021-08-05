@@ -348,7 +348,7 @@ class Book {
 		if (path.includes('EMPTY_PAGE')) {
 			return new Promise((resolve) => {
 				try {
-					const doc = document.implementation.createHTMLDocument('hi');
+					const doc = document.implementation.createHTMLDocument('inner-chapter');
 					const div = doc.createElement('div');
 					div.classList.add('inter-chapter-loader');
 					div.innerText = '';
