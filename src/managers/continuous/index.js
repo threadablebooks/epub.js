@@ -127,54 +127,54 @@ class ContinuousViewManager extends DefaultViewManager {
 		return view.display(this.request);
 	}
 
-	observeMovingBack(view) {
-		var observer = new IntersectionObserver((entries) => {
-			if (entries[0].isIntersecting === true) {
-				setTimeout(() => {
-					const next = this.views.last().section.next();
-					if (next && !next.idref.includes(EMPTY_PAGE_STRING)) {
-						this.clear();
+	observeMovingForward() {
+		const next = this.views.last().section.next();
+		if (next && !next.idref.includes(EMPTY_PAGE_STRING)) {
+			this.clear();
 
-						let forceRight = false;
+			let forceRight = false;
 
-						return this.defaultAppend(next)
-							.then(() => {
-								return this.handleNextPrePaginated(forceRight, next, this.defaultAppend);
-							}, (err) => {
-								return err;
-							})
-							.then(() => {
-								this.views.show();
-								setTimeout(() => {
-									this.check();
-								}, 200);
-							});
-					}
-				}, 500);
-			}
-		}, { threshold: [1] });
-
-		observer.observe(view.element);
+			return this.defaultAppend(next)
+				.then(() => {
+					return this.handleNextPrePaginated(forceRight, next, this.defaultAppend);
+				}, (err) => {
+					return err;
+				})
+				.then(() => {
+					this.views.show();
+					setTimeout(() => {
+						this.check();
+					}, 200);
+				});
+		}
 	}
 
-	observeMovingForward(view) {
-		var observer = new IntersectionObserver((entries) => {
+	observeMovingBack() {
+		const prev = this.views.first().section.prev();
+		if (prev && !prev.idref.includes(EMPTY_PAGE_STRING)) {
+			this.clear();
+
+			return this.defaultPrepend(prev)
+				.then(() => {
+					if (this.settings.axis === "horizontal") {
+						this.scrollTo(this.container.scrollWidth - this.layout.delta, 0, true);
+					}
+					this.views.show();
+					setTimeout(() => {
+						this.check();
+					}, 1200);
+				});
+		}
+	}
+
+	observeIfChapterIsInView(view) {
+		const observer = new IntersectionObserver((entries) => {
 			if (entries[0].isIntersecting === true) {
 				setTimeout(() => {
-					const prev = this.views.first().section.prev();
-					if (prev && !prev.idref.includes(EMPTY_PAGE_STRING)) {
-						this.clear();
-
-						return this.defaultPrepend(prev)
-							.then(() => {
-								if (this.settings.axis === "horizontal") {
-									this.scrollTo(this.container.scrollWidth - this.layout.delta, 0, true);
-								}
-								this.views.show();
-								setTimeout(() => {
-									this.check();
-								}, 1200);
-							});
+					if (this.readingDirection === 'backward') {
+						this.observeMovingBack();
+					} else {
+						this.observeMovingForward();
 					}
 				}, 500);
 			}
@@ -185,11 +185,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	afterDisplayed(view) {
 		if (view.section.idref.includes(EMPTY_PAGE_STRING)) {
-			if (this.readingDirection === 'backward') {
-				this.observeMovingBack(view);
-			} else {
-				this.observeMovingForward(view);
-			}
+			this.observeIfChapterIsInView(view);
 		} else {
 			this.emit(EVENTS.MANAGERS.ADDED, view);
 		}
@@ -214,7 +210,6 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	append(section){
-		this.readingDirection = 'forward';
 		var view = this.createView(section);
 
 		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
@@ -260,7 +255,6 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	prepend(section){
 		var view = this.createView(section);
-		this.readingDirection = 'backward';
 
 		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
 			this.counter(bounds);
@@ -582,6 +576,14 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		} else {
 			this.ignore = false;
+		}
+
+		const rawScrollOffset = scrollLeft - this.prevScrollLeft;
+
+		if (rawScrollOffset < 0) {
+			this.readingDirection = 'backward';
+		} else {
+			this.readingDirection = 'forward';
 		}
 
 		this.scrollDeltaVert += Math.abs(scrollTop-this.prevScrollTop);
