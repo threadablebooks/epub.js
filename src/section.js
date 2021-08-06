@@ -50,22 +50,30 @@ class Section {
 		var loading = new defer();
 		var loaded = loading.promise;
 
-		if(this.contents) {
+		if (this.url.includes('EMPTY_PAGE')) {
+			const doc = document.implementation.createHTMLDocument('inner-chapter');
+			const div = doc.createElement('section');
+			div.classList.add('inter-chapter-loader');
+
+			div.innerText = 'Hi there again';
+			doc.body.appendChild(div);
+			loading.resolve(doc);
+		} else if (this.contents) {
 			loading.resolve(this.contents);
 		} else {
 			request(this.url)
-				.then(function(xml){
+				.then((xml) => {
 					// var directory = new Url(this.url).directory;
 
 					this.document = xml;
 					this.contents = xml.documentElement;
 
 					return this.hooks.content.trigger(this.document, this);
-				}.bind(this))
-				.then(function(){
+				})
+				.then(() => {
 					loading.resolve(this.contents);
-				}.bind(this))
-				.catch(function(error){
+				})
+				.catch((error) => {
 					loading.reject(error);
 				});
 		}
@@ -89,10 +97,10 @@ class Section {
 	render(_request){
 		var rendering = new defer();
 		var rendered = rendering.promise;
-		this.output; // TODO: better way to return this from hooks?
+		var output; // TODO: better way to return this from hooks?
 
 		this.load(_request).
-			then(function(contents){
+			then((contents) => {
 				var userAgent = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
 				var isIE = userAgent.indexOf('Trident') >= 0;
 				var Serializer;
@@ -102,16 +110,19 @@ class Section {
 					Serializer = XMLSerializer;
 				}
 				var serializer = new Serializer();
-				this.output = serializer.serializeToString(contents);
-				return this.output;
-			}.bind(this)).
-			then(function(){
-				return this.hooks.serialize.trigger(this.output, this);
-			}.bind(this)).
-			then(function(){
-				rendering.resolve(this.output);
-			}.bind(this))
-			.catch(function(error){
+				output = serializer.serializeToString(contents);
+				return output;
+			}).
+			then(() => {
+				if (this.url.includes('EMPTY_PAGE')) {
+					return Promise.resolve();
+				}
+				return this.hooks.serialize.trigger(output, this);
+			}).
+			then(() => {
+				rendering.resolve(output);
+			})
+			.catch((error) => {
 				rendering.reject(error);
 			});
 

@@ -344,18 +344,22 @@ class Book {
 	 * @return {Promise}     returns a promise with the requested resource
 	 */
 	load(path) {
-		// console.log('BOOK PATH', path);
 		if (path.includes('EMPTY_PAGE')) {
 			return new Promise((resolve) => {
 				try {
+					if (this.previousSectionForSaving) {
+						return resolve(this.previousSectionForSaving);
+					}
 					const doc = document.implementation.createHTMLDocument('inner-chapter');
-					const div = doc.createElement('div');
+					const div = doc.createElement('section');
 					div.classList.add('inter-chapter-loader');
-					div.innerText = '';
+
+					div.innerText = 'Hi there again';
 					doc.body.appendChild(div);
-					resolve(doc);
+
+					return resolve(doc);
 				} catch (e) {
-					console.log('ERRRRROR', e);
+					console.log('Error loading', e);
 				}
 			});
 		}

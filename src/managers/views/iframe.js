@@ -143,11 +143,10 @@ class IframeView {
 
 		// Render Chain
 		return this.sectionRender
-			.then(function(contents){
+			.then((contents) => {
 				return this.load(contents);
-			}.bind(this))
-			.then(function(){
-
+			})
+			.then(() => {
 				// find and report the writingMode axis
 				let writingMode = this.contents.writingMode();
 
@@ -169,7 +168,6 @@ class IframeView {
 				this.setWritingMode(writingMode);
 				this.emit(EVENTS.VIEWS.WRITING_MODE, writingMode);
 
-
 				// apply the layout function to the contents
 				this.layout.format(this.contents, this.section, this.axis);
 
@@ -179,22 +177,22 @@ class IframeView {
 				return new Promise((resolve, reject) => {
 					// Expand the iframe to the full size of the content
 					this.expand();
-
 					if (this.settings.forceRight) {
 						this.element.style.marginLeft = this.width() + "px";
 					}
+
 					resolve();
 				});
 
-			}.bind(this), function(e){
+			}, (e) => {
 				this.emit(EVENTS.VIEWS.LOAD_ERROR, e);
 				return new Promise((resolve, reject) => {
 					reject(e);
 				});
-			}.bind(this))
-			.then(function() {
+			})
+			.then(() => {
 				this.emit(EVENTS.VIEWS.RENDERED, this.section);
-			}.bind(this));
+			});
 
 	}
 

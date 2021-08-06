@@ -191,7 +191,6 @@ class Layout {
 	 */
 	format(contents, section, axis){
 		var formating;
-
 		if (this.name === "pre-paginated") {
 			formating = contents.fit(this.columnWidth, this.height, section);
 		} else if (this._flow === "paginated") {
