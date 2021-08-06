@@ -50,15 +50,7 @@ class Section {
 		var loading = new defer();
 		var loaded = loading.promise;
 
-		if (this.url.includes('EMPTY_PAGE')) {
-			const doc = document.implementation.createHTMLDocument('inner-chapter');
-			const div = doc.createElement('section');
-			div.classList.add('inter-chapter-loader');
-
-			div.innerText = 'Hi there again';
-			doc.body.appendChild(div);
-			loading.resolve(doc);
-		} else if (this.contents) {
+		if (this.contents) {
 			loading.resolve(this.contents);
 		} else {
 			request(this.url)
@@ -97,7 +89,7 @@ class Section {
 	render(_request){
 		var rendering = new defer();
 		var rendered = rendering.promise;
-		var output; // TODO: better way to return this from hooks?
+		this.output; // TODO: better way to return this from hooks?
 
 		this.load(_request).
 			then((contents) => {
@@ -110,17 +102,17 @@ class Section {
 					Serializer = XMLSerializer;
 				}
 				var serializer = new Serializer();
-				output = serializer.serializeToString(contents);
-				return output;
+				this.output = serializer.serializeToString(contents);
+				return this.output;
 			}).
 			then(() => {
 				if (this.url.includes('EMPTY_PAGE')) {
 					return Promise.resolve();
 				}
-				return this.hooks.serialize.trigger(output, this);
+				return this.hooks.serialize.trigger(this.output, this);
 			}).
 			then(() => {
-				rendering.resolve(output);
+				rendering.resolve(this.output);
 			})
 			.catch((error) => {
 				rendering.reject(error);

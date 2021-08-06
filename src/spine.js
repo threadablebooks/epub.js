@@ -55,7 +55,7 @@ class Spine {
 		})).slice(0, -1);
 
 		this.items = interleave(this.items, { "idref": "empty_page", "linear": "yes", "properties": [], href: "EMPTY_PAGE" });
-		console.log(this.items);
+
 		this.items.forEach( (item, index) => {
 			var manifestItem = this.manifest[item.idref];
 			var spineItem;

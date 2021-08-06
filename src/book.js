@@ -347,17 +347,14 @@ class Book {
 		if (path.includes('EMPTY_PAGE')) {
 			return new Promise((resolve) => {
 				try {
-					if (this.previousSectionForSaving) {
-						return resolve(this.previousSectionForSaving);
-					}
 					const doc = document.implementation.createHTMLDocument('inner-chapter');
-					const div = doc.createElement('section');
+					const div = doc.createElement('div');
 					div.classList.add('inter-chapter-loader');
 
-					div.innerText = 'Hi there again';
+					div.innerText = '';
 					doc.body.appendChild(div);
 
-					return resolve(doc);
+					resolve(doc);
 				} catch (e) {
 					console.log('Error loading', e);
 				}
@@ -521,9 +518,6 @@ class Book {
 				this.loaded.displayOptions.then(() => {
 					this.opening.resolve(this);
 				});
-			})
-			.catch((err) => {
-				console.error(err);
 			});
 		} else {
 			// Resolve book opened promise

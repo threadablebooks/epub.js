@@ -50,7 +50,6 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	display(section, target){
-		console.log('we are displaying?', section);
 		return DefaultViewManager.prototype.display.call(this, section, target)
 			.then(function () {
 				return this.fill();
@@ -63,7 +62,6 @@ class ContinuousViewManager extends DefaultViewManager {
 		this.q.enqueue(() => {
 			return this.check();
 		}).then((result) => {
-			console.log('result??', result);
 			if (result) {
 				this.fill(full);
 			} else {
@@ -225,9 +223,8 @@ class ContinuousViewManager extends DefaultViewManager {
 		view.on(EVENTS.VIEWS.WRITING_MODE, (mode) => {
 			this.updateWritingMode(mode);
 		});
-		console.log('initial views', { ...this.views });
+
 		this.views.append(view);
-		console.log('subsequent', this.views);
 		view.onDisplayed = this.afterDisplayed.bind(this);
 
 		return view;
