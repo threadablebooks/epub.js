@@ -47,6 +47,8 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		this.scrollTop = 0;
 		this.scrollLeft = 0;
+
+		this.ignoreAutoProgress = !this.settings.snap;
 	}
 
 	display(section, target){
@@ -184,7 +186,7 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	afterDisplayed(view) {
-		if (view.section.idref.includes(EMPTY_PAGE_STRING)) {
+		if (view.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 			this.observeIfChapterIsInView(view);
 		} else {
 			this.emit(EVENTS.MANAGERS.ADDED, view);
@@ -380,7 +382,7 @@ class ContinuousViewManager extends DefaultViewManager {
 		let prepend = () => {
 			let first = this.views.first();
 
-			if (first.section.idref.includes(EMPTY_PAGE_STRING)) {
+			if (first.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 				return Promise.resolve();
 			}
 
@@ -393,7 +395,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		let append = () => {
 			let last = this.views.last();
-			if (last.section.idref.includes(EMPTY_PAGE_STRING)) {
+			if (last.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 				return Promise.resolve();
 			}
 
