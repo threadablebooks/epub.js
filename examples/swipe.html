@@ -41,7 +41,11 @@
       flow: "paginated",
       width: "100%",
       height: "100%",
-      snap: true
+      snap: {
+        duration: 80,
+        minVelocity: 0.3,
+        minDistance: 10,
+      },
     });
 
     ''

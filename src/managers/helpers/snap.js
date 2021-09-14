@@ -260,11 +260,20 @@ class Snap {
   snap(howMany = 0) {
     const left = this.scrollLeft;
     const snapWidth = this.layout.pageWidth * this.layout.divisor;
-    let snapTo = Math.round(left / snapWidth) * snapWidth;
-
-    // if (howMany) {
-    //   snapTo += (howMany * snapWidth);
-    // }
+    
+    // Get page number to snap to based on if we're going one page forward or backward
+    // If howMany = 0 (i.e. valid swipe was not detected),
+    // snap to current or prev/next page based on scroll distance
+    let pageToSnapTo;
+    if (howMany > 0) {
+      pageToSnapTo = Math.floor(left / snapWidth) + howMany;
+    } else if (howMany < 0) {
+      pageToSnapTo = Math.ceil(left / snapWidth) + howMany;
+    } else {
+      pageToSnapTo = Math.round(left / snapWidth);
+    }
+    
+    let snapTo = pageToSnapTo * snapWidth;
 
     return this.smoothScrollTo(snapTo);
   }
