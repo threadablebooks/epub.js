@@ -89,6 +89,9 @@ export class Mark {
     }
 
     filteredRanges() {
+        if (!this.range) {
+            return [];
+        }
       var rects = Array.from(this.range.getClientRects());
 
       let filteredRects = [];
