@@ -92,24 +92,10 @@ export class Mark {
         if (!this.range) {
             return [];
         }
-      var rects = Array.from(this.range.getClientRects());
-
-      let filteredRects = [];
-      for (let i = 0; i < rects.length; i++) {
-          const curRect = rects[i];
-          let shouldPush = true;
-          for (let j = 0; j < rects.length; j++) {
-              if (curRect !== rects[j] && contains(curRect, rects[j])) {
-                  shouldPush = false;
-                  break;
-              }
-          }
-          if (shouldPush) {
-              filteredRects.push(curRect);
-          }
-      }
-
-      return filteredRects;
+        const rects = Array.from(this.range.getClientRects());
+        const stringRects = rects.map((r) => JSON.stringify(r));
+        const setRects = new Set(stringRects);
+        return Array.from(setRects).map((sr) => JSON.parse(sr));
     }
 }
 
