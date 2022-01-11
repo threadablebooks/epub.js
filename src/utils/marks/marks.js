@@ -98,22 +98,13 @@ export class Mark {
         const stringRectsSet = new Set(stringRects);
         const rectsSet = Array.from(stringRectsSet).map((sr) => JSON.parse(sr));
 
-        let filteredRects = [];
-        for (let i = 0; i < rectsSet.length; i++) {
-            const curRect = rectsSet[i];
-            let shouldPush = true;
-            for (let j = 0; j < rectsSet.length; j++) {
-                if (curRect !== rectsSet[j] && contains(curRect, rectsSet[j])) {
-                    shouldPush = false;
-                    break;
-                }
+        return rectsSet.reduce((filteredRects, curRect) => {
+            const shouldNotPush = rectsSet.some((item) => curRect !== item && contains(curRect, item));
+            if (!shouldNotPush) {
+              filteredRects.push(curRect);
             }
-            if (shouldPush) {
-                filteredRects.push(curRect);
-            }
-        }
-
-        return filteredRects;
+            return filteredRects;
+          }, []);
     }
 }
 
