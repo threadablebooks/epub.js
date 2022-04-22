@@ -50,22 +50,22 @@ class Section {
 		var loading = new defer();
 		var loaded = loading.promise;
 
-		if(this.contents) {
+		if (this.contents) {
 			loading.resolve(this.contents);
 		} else {
 			request(this.url)
-				.then(function(xml){
+				.then((xml) => {
 					// var directory = new Url(this.url).directory;
 
 					this.document = xml;
 					this.contents = xml.documentElement;
 
 					return this.hooks.content.trigger(this.document, this);
-				}.bind(this))
-				.then(function(){
+				})
+				.then(() => {
 					loading.resolve(this.contents);
-				}.bind(this))
-				.catch(function(error){
+				})
+				.catch((error) => {
 					loading.reject(error);
 				});
 		}
@@ -92,7 +92,7 @@ class Section {
 		this.output; // TODO: better way to return this from hooks?
 
 		this.load(_request).
-			then(function(contents){
+			then((contents) => {
 				var userAgent = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
 				var isIE = userAgent.indexOf('Trident') >= 0;
 				var Serializer;
@@ -104,14 +104,17 @@ class Section {
 				var serializer = new Serializer();
 				this.output = serializer.serializeToString(contents);
 				return this.output;
-			}.bind(this)).
-			then(function(){
+			}).
+			then(() => {
+				if (this.url.includes('EMPTY_PAGE')) {
+					return Promise.resolve();
+				}
 				return this.hooks.serialize.trigger(this.output, this);
-			}.bind(this)).
-			then(function(){
+			}).
+			then(() => {
 				rendering.resolve(this.output);
-			}.bind(this))
-			.catch(function(error){
+			})
+			.catch((error) => {
 				rendering.reject(error);
 			});
 

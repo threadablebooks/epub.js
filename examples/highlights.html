@@ -81,6 +81,17 @@
       // console.log(toc);
     });
 
+    book.ready
+    .then(async function () {
+      const locations = JSON.parse(localStorage.getItem('moby-dick-locations'));
+      const generatedLocations = await book.locations.generate(150, locations);
+
+      localStorage.setItem('moby-dick-locations', JSON.stringify(generatedLocations));
+
+      // Load a random location
+      const percent = book.locations.percentageFromCfi('epubcfi(/6/34[xchapter_003]!/4/2,/114/1:549,/118/1:796)');
+    });
+
     var next = document.getElementById("next");
     next.addEventListener("click", function(){
       rendition.next();

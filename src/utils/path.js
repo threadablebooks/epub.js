@@ -12,6 +12,9 @@ class Path {
 		var protocol;
 		var parsed;
 
+		if (pathString.includes('EMPTY_PAGE')) {
+			return;
+		}
 		protocol = pathString.indexOf("://");
 		if (protocol > -1) {
 			pathString = new URL(pathString).pathname;

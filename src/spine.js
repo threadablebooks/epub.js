@@ -46,6 +46,16 @@ class Spine {
 		this.baseUrl = _package.baseUrl || _package.basePath || "";
 		this.length = this.items.length;
 
+		// this.items.push({ "idref": "empty_page", "linear": "yes", "properties": [], "index": this.items.length, href: "://" });
+		const interleave = (arr, thing) => [].concat(...arr.map((n, index) => {
+			const linear = arr[index].linear === 'yes' && (arr[index + 1] || {}).linear === 'yes' ? 'yes' : 'no';
+
+			const item = { ...thing, idref: `${thing.idref}_${index}`, href: `${thing.href}_${index}`, linear };
+			return [n, item];
+		})).slice(0, -1);
+
+		this.items = interleave(this.items, { "idref": "empty_page", "linear": "yes", "properties": [], href: "EMPTY_PAGE" });
+
 		this.items.forEach( (item, index) => {
 			var manifestItem = this.manifest[item.idref];
 			var spineItem;
@@ -104,7 +114,6 @@ class Spine {
 			spineItem = new Section(item, this.hooks);
 
 			this.append(spineItem);
-
 
 		});
 

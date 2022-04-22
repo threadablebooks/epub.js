@@ -344,6 +344,23 @@ class Book {
 	 * @return {Promise}     returns a promise with the requested resource
 	 */
 	load(path) {
+		if (path.includes('EMPTY_PAGE')) {
+			return new Promise((resolve) => {
+				try {
+					const doc = document.implementation.createHTMLDocument('inner-chapter');
+					const div = doc.createElement('div');
+					div.classList.add('inter-chapter-loader');
+
+					div.innerText = '';
+					doc.body.appendChild(div);
+
+					resolve(doc);
+				} catch (e) {
+					console.log('Error loading', e);
+				}
+			});
+		}
+
 		var resolved = this.resolve(path);
 		if(this.archived) {
 			return this.archive.request(resolved);
@@ -501,9 +518,6 @@ class Book {
 				this.loaded.displayOptions.then(() => {
 					this.opening.resolve(this);
 				});
-			})
-			.catch((err) => {
-				console.error(err);
 			});
 		} else {
 			// Resolve book opened promise

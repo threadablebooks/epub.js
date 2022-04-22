@@ -3,7 +3,7 @@ import {extend, borders, uuid, isNumber, bounds, defer, createBlobUrl, revokeBlo
 import EpubCFI from "../../epubcfi";
 import Contents from "../../contents";
 import { EVENTS } from "../../utils/constants";
-import { Pane, Highlight, Underline } from "marks-pane";
+import { Pane, Highlight, Underline } from "../../utils/marks/marks";
 
 class IframeView {
 	constructor(section, options) {
@@ -154,11 +154,10 @@ class IframeView {
 
 		// Render Chain
 		return this.sectionRender
-			.then(function(contents){
+			.then((contents) => {
 				return this.load(contents);
-			}.bind(this))
-			.then(function(){
-
+			})
+			.then(() => {
 				// find and report the writingMode axis
 				let writingMode = this.contents.writingMode();
 
@@ -180,7 +179,6 @@ class IframeView {
 				this.setWritingMode(writingMode);
 				this.emit(EVENTS.VIEWS.WRITING_MODE, writingMode);
 
-
 				// apply the layout function to the contents
 				this.layout.format(this.contents, this.section, this.axis);
 
@@ -190,22 +188,22 @@ class IframeView {
 				return new Promise((resolve, reject) => {
 					// Expand the iframe to the full size of the content
 					this.expand();
-
 					if (this.settings.forceRight) {
 						this.element.style.marginLeft = this.width() + "px";
 					}
+
 					resolve();
 				});
 
-			}.bind(this), function(e){
+			}, (e) => {
 				this.emit(EVENTS.VIEWS.LOAD_ERROR, e);
 				return new Promise((resolve, reject) => {
 					reject(e);
 				});
-			}.bind(this))
-			.then(function() {
+			})
+			.then(() => {
 				this.emit(EVENTS.VIEWS.RENDERED, this.section);
-			}.bind(this));
+			});
 
 	}
 
@@ -336,63 +334,63 @@ class IframeView {
 	reframe(width, height) {
 		var size;
 
-		if(isNumber(width)){
-			this.element.style.width = width + "px";
-			this.iframe.style.width = width + "px";
-			this._width = width;
-		}
+    if (isNumber(width)){
+      this.element.style.width = `${width}px`;
+      this.iframe.style.width = `${width}px`;
+      this._width = width;
+    }
 
-		if(isNumber(height)){
-			this.element.style.height = height + "px";
-			this.iframe.style.height = height + "px";
-			this._height = height;
-		}
+    if (isNumber(height)){
+      this.element.style.height = `${height}px`;
+      this.iframe.style.height = `${height}px`;
+      this._height = height;
+    }
 
 		let widthDelta = this.prevBounds ? width - this.prevBounds.width : width;
 		let heightDelta = this.prevBounds ? height - this.prevBounds.height : height;
 
-		size = {
-			width: width,
-			height: height,
-			widthDelta: widthDelta,
-			heightDelta: heightDelta,
-		};
+    size = {
+      width: width,
+      height: height,
+      widthDelta: widthDelta,
+      heightDelta: heightDelta,
+    };
 
-		this.pane && this.pane.render();
+    // this.pane && this.pane.render();
 
-		requestAnimationFrame(() => {
-			let mark;
-			for (let m in this.marks) {
-				if (this.marks.hasOwnProperty(m)) {
-					mark = this.marks[m];
-					this.placeMark(mark.element, mark.range);
-				}
-			}
-		});
+    requestAnimationFrame(() => {
+      let mark;
+      for (const m in this.marks) {
+        if (this.marks.hasOwnProperty(m)) {
+          mark = this.marks[m];
+          this.placeMark(mark.element, mark.range);
+        }
+      }
+    });
 
-		this.onResize(this, size);
+    this.onResize(this, size);
 
-		this.emit(EVENTS.VIEWS.RESIZED, size);
+    this.emit(EVENTS.VIEWS.RESIZED, size);
 
-		this.prevBounds = size;
+    this.prevBounds = size;
 
-		this.elementBounds = bounds(this.element);
+    this.elementBounds = bounds(this.element);
 
-	}
+  }
 
 
-	load(contents) {
-		var loading = new defer();
-		var loaded = loading.promise;
+  load(contents) {
+    const loading = new defer();
+    const loaded = loading.promise;
 
-		if(!this.iframe) {
-			loading.reject(new Error("No Iframe Available"));
-			return loaded;
-		}
+    if (!this.iframe) {
+      loading.reject(new Error('No Iframe Available'));
+      return loaded;
+    }
 
-		this.iframe.onload = function(event) {
+    this.iframe.onload = function(event) {
 
-			this.onLoad(event, loading);
+      this.onLoad(event, loading);
 
 		}.bind(this);
 

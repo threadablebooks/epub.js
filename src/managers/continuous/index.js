@@ -3,12 +3,16 @@ import DefaultViewManager from "../default";
 import Snap from "../helpers/snap";
 import { EVENTS } from "../../utils/constants";
 import debounce from "lodash/debounce";
+import Section from "../../section";
+
+const EMPTY_PAGE_STRING = 'empty_page';
 
 class ContinuousViewManager extends DefaultViewManager {
 	constructor(options) {
 		super(options);
 
 		this.name = "continuous";
+		this.readingDirection = 'forward';
 
 		this.settings = extend(this.settings || {}, {
 			infinite: true,
@@ -47,6 +51,8 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		this.scrollTop = 0;
 		this.scrollLeft = 0;
+
+		this.ignoreAutoProgress = !this.settings.snap;
 	}
 
 	display(section, target){
@@ -100,9 +106,6 @@ class ContinuousViewManager extends DefaultViewManager {
 
 	// Remove Previous Listeners if present
 	removeShownListeners(view){
-
-		// view.off("shown", this.afterDisplayed);
-		// view.off("shown", this.afterDisplayedAbove);
 		view.onDisplayed = function(){};
 
 	}
@@ -124,9 +127,90 @@ class ContinuousViewManager extends DefaultViewManager {
 			this.updateWritingMode(mode);
 		});
 
-		// view.on(EVENTS.VIEWS.SHOWN, this.afterDisplayed.bind(this));
 		view.onDisplayed = this.afterDisplayed.bind(this);
 		view.onResize = this.afterResized.bind(this);
+
+		return view.display(this.request);
+	}
+
+	observeMovingForward() {
+		const next = this.views.last().section.next();
+		if (next && !next.idref.includes(EMPTY_PAGE_STRING)) {
+			this.clear();
+
+			let forceRight = false;
+
+			return this.defaultAppend(next)
+				.then(() => {
+					return this.handleNextPrePaginated(forceRight, next, this.defaultAppend);
+				}, (err) => {
+					return err;
+				})
+				.then(() => {
+					this.views.show();
+					setTimeout(() => {
+						this.check();
+					}, 200);
+				});
+		}
+	}
+
+	observeMovingBack() {
+		const prev = this.views.first().section.prev();
+		if (prev && !prev.idref.includes(EMPTY_PAGE_STRING)) {
+			this.clear();
+
+			return this.defaultPrepend(prev)
+				.then(() => {
+					if (this.settings.axis === "horizontal") {
+						this.scrollTo(this.container.scrollWidth - this.layout.delta, 0, true);
+					}
+					this.views.show();
+					setTimeout(() => {
+						this.check();
+					}, 1200);
+				});
+		}
+	}
+
+	observeIfChapterIsInView(view) {
+		const observer = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting === true) {
+				setTimeout(() => {
+					if (this.readingDirection === 'backward') {
+						this.observeMovingBack();
+					} else {
+						this.observeMovingForward();
+					}
+				}, 500);
+			}
+		}, { threshold: [1] });
+
+		observer.observe(view.element);
+	}
+
+	afterDisplayed(view) {
+		if (view.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+			this.observeIfChapterIsInView(view);
+		} else {
+			this.emit(EVENTS.MANAGERS.ADDED, view);
+		}
+	}
+
+	defaultAppend(section, forceRight = false) {
+		var view = this.createView(section, forceRight);
+		this.views.append(view);
+
+		view.onDisplayed = this.afterDisplayed.bind(this);
+		view.onResize = this.afterResized.bind(this);
+
+		view.on(EVENTS.VIEWS.AXIS, (axis) => {
+			this.updateAxis(axis);
+		});
+
+		view.on(EVENTS.VIEWS.WRITING_MODE, (mode) => {
+			this.updateWritingMode(mode);
+		});
 
 		return view.display(this.request);
 	}
@@ -147,10 +231,32 @@ class ContinuousViewManager extends DefaultViewManager {
 		});
 
 		this.views.append(view);
-
 		view.onDisplayed = this.afterDisplayed.bind(this);
 
 		return view;
+	}
+
+	defaultPrepend(section, forceRight = false) {
+		var view = this.createView(section, forceRight);
+
+		view.on(EVENTS.VIEWS.RESIZED, (bounds) => {
+			this.counter(bounds);
+		});
+
+		this.views.prepend(view);
+
+		view.onDisplayed = this.afterDisplayed.bind(this);
+		view.onResize = this.afterResized.bind(this);
+
+		view.on(EVENTS.VIEWS.AXIS, (axis) => {
+			this.updateAxis(axis);
+		});
+
+		view.on(EVENTS.VIEWS.WRITING_MODE, (mode) => {
+			this.updateWritingMode(mode);
+		});
+
+		return view.display(this.request);
 	}
 
 	prepend(section){
@@ -172,7 +278,6 @@ class ContinuousViewManager extends DefaultViewManager {
 		this.views.prepend(view);
 
 		view.onDisplayed = this.afterDisplayed.bind(this);
-
 		return view;
 	}
 
@@ -201,7 +306,6 @@ class ContinuousViewManager extends DefaultViewManager {
 			isVisible = this.isVisible(view, offset, offset, container);
 
 			if(isVisible === true) {
-				// console.log("visible " + view.index, view.displayed);
 
 				if (!view.displayed) {
 					let displayed = view.display(this.request)
@@ -217,7 +321,6 @@ class ContinuousViewManager extends DefaultViewManager {
 				visible.push(view);
 			} else {
 				this.q.enqueue(view.destroy.bind(view));
-				// console.log("hidden " + view.index, view.displayed);
 
 				clearTimeout(this.trimTimeout);
 				this.trimTimeout = setTimeout(function(){
@@ -282,6 +385,11 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		let prepend = () => {
 			let first = this.views.first();
+
+			if (first.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+				return Promise.resolve();
+			}
+
 			let prev = first && first.section.prev();
 
 			if(prev) {
@@ -291,12 +399,14 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		let append = () => {
 			let last = this.views.last();
-			let next = last && last.section.next();
+			if (last.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+				return Promise.resolve();
+			}
 
+			let next = last && last.section.next();
 			if(next) {
 				newViews.push(this.append(next));
 			}
-
 		};
 
 		let end = offset + visibleLength + delta;
@@ -309,7 +419,6 @@ class ContinuousViewManager extends DefaultViewManager {
 		if (start < 0) {
 			prepend();
 		}
-		
 
 		let promises = newViews.map((view) => {
 			return view.display(this.request);
@@ -333,8 +442,6 @@ class ContinuousViewManager extends DefaultViewManager {
 			checking.resolve(false);
 			return checking.promise;
 		}
-
-
 	}
 
 	trim(){
@@ -475,6 +582,14 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		} else {
 			this.ignore = false;
+		}
+
+		const rawScrollOffset = scrollLeft - this.prevScrollLeft;
+
+		if (rawScrollOffset < 0) {
+			this.readingDirection = 'backward';
+		} else {
+			this.readingDirection = 'forward';
 		}
 
 		this.scrollDeltaVert += Math.abs(scrollTop-this.prevScrollTop);
