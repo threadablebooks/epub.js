@@ -98,6 +98,7 @@ export class Mark {
         const stringRectsSet = new Set(stringRects);
         const rectsSet = Array.from(stringRectsSet).map((sr) => JSON.parse(sr));
 
+        // TODO: This reduce breaks the underline sometimes
         return rectsSet.reduce((filteredRects, curRect) => {
             const shouldNotPush = rectsSet.some((item) => curRect !== item && contains(curRect, item));
             if (!shouldNotPush) {
@@ -105,6 +106,24 @@ export class Mark {
             }
             return filteredRects;
           }, []);
+
+        // Before the reduce above, it was this
+        // return Array.from(stringRectsSet).map((sr) => JSON.parse(sr));
+
+        // === Original ===
+        // De-duplicate the boxes
+        // return rects.filter((box) => {
+        //   for (var i = 0; i < rects.length; i++) {
+        //     if (rects[i] === box) {
+        //       return true;
+        //     }
+        //     let contained = contains(rects[i], box);
+        //     if (contained) {
+        //       return false;
+        //     }
+        //   }
+        //   return true;
+        // });
     }
 }
 
