@@ -95,16 +95,22 @@ export class Mark {
 
         const rects = Array.from(this.range.getClientRects());
         const stringRects = rects.map((r) => JSON.stringify(r));
-        const stringRectsSet = new Set(stringRects);
-        const rectsSet = Array.from(stringRectsSet).map((sr) => JSON.parse(sr));
+        const stringRectsSet = new Set(stringRects); // de-duplicate the boxes
+        const uniqueRects = Array.from(stringRectsSet)
+            .map((sr) => JSON.parse(sr))
+            .filter(r => r.width !== 0); // filter out any boxes with a width of 0
 
-        return rectsSet.reduce((filteredRects, curRect) => {
-            const shouldNotPush = rectsSet.some((item) => curRect !== item && contains(curRect, item));
+        const filteredRanges = uniqueRects.reduce((filteredRects, currentRect) => {
+            const shouldNotPush = uniqueRects.some((item) => {
+                return currentRect !== item && contains(currentRect, item);
+            });
             if (!shouldNotPush) {
-              filteredRects.push(curRect);
+                filteredRects.push(currentRect);
             }
             return filteredRects;
-          }, []);
+        }, []);
+
+        return filteredRanges;
     }
 }
 
