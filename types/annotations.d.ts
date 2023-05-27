@@ -4,6 +4,9 @@ import View from "./managers/view";
 export default class Annotations {
   constructor(rendition: Rendition);
 
+  _annotations: any;
+  _annotationsBySectionIndex: any;
+
   add(type: string, cfiRange: string, data?: object, cb?: Function, className?: string, styles?: object): Annotation;
 
   remove(cfiRange: string, type: string): void;

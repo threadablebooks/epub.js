@@ -7,6 +7,7 @@ import Themes from "./themes";
 import EpubCFI from "./epubcfi";
 import Annotations from "./annotations";
 import Queue from "./utils/queue";
+import Manager from "./managers/manager"
 
 export interface RenditionOptions {
   width?: number | string,
@@ -25,7 +26,8 @@ export interface RenditionOptions {
   overflow?: string,
   snap?: boolean | object,
   defaultDirection?: string,
-  allowScriptedContent?: boolean
+  allowScriptedContent?: boolean,
+  fullsize?: boolean
 }
 
 export interface DisplayedLocation {
@@ -52,6 +54,7 @@ export default class Rendition {
 
     settings: RenditionOptions;
     book: Book;
+    manager: Manager;
     hooks: {
       display: Hook,
       serialize: Hook,
