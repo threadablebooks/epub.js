@@ -484,7 +484,6 @@ class ContinuousViewManager extends DefaultViewManager {
 		var bounds = view.bounds();
 
 		this.views.remove(view);
-		console.log('remove view')
 		this.emit(EVENTS.MANAGERS.REMOVED, view);
 		
 		if(above) {
