@@ -24,6 +24,7 @@ export const EVENTS = {
     ADDED : "added",
     SCROLL : "scroll",
     SCROLLED : "scrolled",
+    BEFORE_REMOVED: "beforeremoved",
     REMOVED : "removed",
   },
   VIEWS : {
@@ -43,6 +44,7 @@ export const EVENTS = {
     DISPLAYED : "displayed",
     DISPLAY_ERROR : "displayerror",
     RENDERED : "rendered",
+    BEFORE_REMOVED : "beforeremoved",
     REMOVED : "removed",
     RESIZED : "resized",
     ORIENTATION_CHANGE : "orientationchange",

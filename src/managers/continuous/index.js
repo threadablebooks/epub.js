@@ -483,7 +483,9 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		var bounds = view.bounds();
 
+		this.emit(EVENTS.MANAGERS.BEFORE_REMOVED, view);
 		this.views.remove(view);
+		this.emit(EVENTS.MANAGERS.REMOVED, view);
 		
 		if(above) {
 			if (this.settings.axis === "vertical") {
