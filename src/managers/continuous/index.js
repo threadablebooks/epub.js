@@ -484,26 +484,24 @@ class ContinuousViewManager extends DefaultViewManager {
 		var bounds = view.bounds();
 
 		this.emit(EVENTS.MANAGERS.BEFORE_REMOVED, view);
-		requestAnimationFrame(() => {
-			this.views.remove(view);
-			this.emit(EVENTS.MANAGERS.REMOVED, view);
-			
-			if(above) {
-				if (this.settings.axis === "vertical") {
-					this.scrollTo(0, prevTop - bounds.height, true);
-				} else {
-					if(this.settings.direction === 'rtl') {
-						if (!this.settings.fullsize) {
-							this.scrollTo(prevLeft, 0, true);
-						} else {
-							this.scrollTo(prevLeft + Math.floor(bounds.width), 0, true);
-						}
+		this.views.remove(view);
+		this.emit(EVENTS.MANAGERS.REMOVED, view);
+		
+		if(above) {
+			if (this.settings.axis === "vertical") {
+				this.scrollTo(0, prevTop - bounds.height, true);
+			} else {
+				if(this.settings.direction === 'rtl') {
+					if (!this.settings.fullsize) {
+						this.scrollTo(prevLeft, 0, true);
 					} else {
-						this.scrollTo(prevLeft - Math.floor(bounds.width), 0, true);
+						this.scrollTo(prevLeft + Math.floor(bounds.width), 0, true);
 					}
+				} else {
+					this.scrollTo(prevLeft - Math.floor(bounds.width), 0, true);
 				}
 			}
-		})
+		}
 
 	}
 
