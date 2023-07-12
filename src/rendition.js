@@ -245,6 +245,7 @@ class Rendition {
 
 		// Listen for displayed views
 		this.manager.on(EVENTS.MANAGERS.ADDED, this.afterDisplayed.bind(this));
+		this.manager.on(EVENTS.MANAGERS.BEFORE_REMOVED, this.beforeRemoved.bind(this));
 		this.manager.on(EVENTS.MANAGERS.REMOVED, this.afterRemoved.bind(this));
 
 		// Listen for resizing
@@ -437,6 +438,22 @@ class Rendition {
 				}
 			});
 
+	}
+
+	/**
+	 * Report what will be removed
+	 * @private
+	 * @param  {*} view
+	 */
+	beforeRemoved(view){
+		/**
+		 * Emit that a section is about to be removed
+		 * @event removed
+		 * @param {Section} section
+		 * @param {View} view
+		 * @memberof Rendition
+		 */
+		this.emit(EVENTS.RENDITION.BEFORE_REMOVED, view.section, view);
 	}
 
 	/**
