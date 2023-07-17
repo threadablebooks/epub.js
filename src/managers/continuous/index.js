@@ -101,6 +101,10 @@ class ContinuousViewManager extends DefaultViewManager {
 	}
 
 	afterResized(view){
+		this.q.enqueue(() => {
+			return this.check();
+		});
+		
 		this.emit(EVENTS.MANAGERS.RESIZE, view.section);
 	}
 
