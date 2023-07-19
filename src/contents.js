@@ -964,8 +964,6 @@ class Contents {
 	triggerSelectedEvent(selection){
 		var range, cfirange;
 
-		console.log({ selection })
-
 		if (selection && selection.rangeCount > 0) {
 			range = selection.getRangeAt(0);
 			if(!range.collapsed) {
