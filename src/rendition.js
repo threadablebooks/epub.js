@@ -930,7 +930,7 @@ class Rendition {
 	 */
 	triggerUnselectedEvent(contents){
 		/**
-		 * Emit that a text selection has occurred
+		 * Emit that a text selection has been dismissed
 		 * @event selected
 		 * @param {Contents} contents
 		 * @memberof Rendition
