@@ -971,8 +971,11 @@ class Contents {
 				cfirange = new EpubCFI(range, this.cfiBase).toString();
 				this.emit(EVENTS.CONTENTS.SELECTED, cfirange);
 				this.emit(EVENTS.CONTENTS.SELECTED_RANGE, range);
+				return;
 			}
 		}
+
+		this.emit(EVENTS.CONTENTS.UNSELECTED);
 	}
 
 	/**

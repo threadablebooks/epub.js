@@ -896,6 +896,7 @@ class Rendition {
 		});
 
 		contents.on(EVENTS.CONTENTS.SELECTED, (e) => this.triggerSelectedEvent(e, contents));
+		contents.on(EVENTS.CONTENTS.UNSELECTED, () => this.triggerUnselectedEvent(contents));
 	}
 
 	/**
@@ -921,6 +922,20 @@ class Rendition {
 		 * @memberof Rendition
 		 */
 		this.emit(EVENTS.RENDITION.SELECTED, cfirange, contents);
+	}
+
+	/**
+	 * Emit a unselection event's CFI Range passed from a a view
+	 * @private
+	 */
+	triggerUnselectedEvent(contents){
+		/**
+		 * Emit that a text selection has been dismissed
+		 * @event selected
+		 * @param {Contents} contents
+		 * @memberof Rendition
+		 */
+		this.emit(EVENTS.RENDITION.UNSELECTED, contents);
 	}
 
 	/**

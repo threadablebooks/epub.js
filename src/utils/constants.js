@@ -10,6 +10,7 @@ export const EVENTS = {
   CONTENTS : {
     EXPAND : "expand",
     RESIZE : "resize",
+    UNSELECTED: "unselected",
     SELECTED : "selected",
     SELECTED_RANGE : "selectedRange",
     LINK_CLICKED : "linkClicked"
@@ -52,6 +53,7 @@ export const EVENTS = {
     RELOCATED : "relocated",
     MARK_CLICKED : "markClicked",
     SELECTED : "selected",
+    UNSELECTED : "unselected",
     LAYOUT: "layout"
   },
   LAYOUT : {
