@@ -403,7 +403,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		let append = () => {
 			let last = this.views.last();
-			if (last.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+			if (last?.section && last.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 				return Promise.resolve();
 			}
 
