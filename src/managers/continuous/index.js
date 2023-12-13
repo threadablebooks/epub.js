@@ -390,7 +390,7 @@ class ContinuousViewManager extends DefaultViewManager {
 		let prepend = () => {
 			let first = this.views.first();
 
-			if (first.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+			if (first?.section && first.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 				return Promise.resolve();
 			}
 
