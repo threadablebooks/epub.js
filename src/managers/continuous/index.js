@@ -390,7 +390,7 @@ class ContinuousViewManager extends DefaultViewManager {
 		let prepend = () => {
 			let first = this.views.first();
 
-			if (first?.section && first.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+			if (first && first.section && first.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 				return Promise.resolve();
 			}
 
@@ -403,7 +403,7 @@ class ContinuousViewManager extends DefaultViewManager {
 
 		let append = () => {
 			let last = this.views.last();
-			if (last?.section && last.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
+			if (last && last.section && last.section.idref.includes(EMPTY_PAGE_STRING) && !this.ignoreAutoProgress) {
 				return Promise.resolve();
 			}
 
