@@ -680,7 +680,11 @@ class DefaultViewManager {
 		let used = 0;
 
 		if(this.settings.fullsize) {
-			offset = vertical ? window.scrollY : window.scrollX;
+			if (!vertical) {
+				offset = window.scrollX;
+			} else {
+				offset = window.scrollY > 0 ? window.scrollY : this.container.parentElement.scrollTop || 0;
+			}
 		}
 
 		let sections = visible.map((view) => {
