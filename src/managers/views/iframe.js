@@ -27,7 +27,7 @@ const threadable_styles = `
   }
 
   p {
-    font-family: Literata;
+    font-family: "Literata";
     font-variant: normal !important;
     line-height: 1.55em;
     margin-bottom: 24px;
@@ -42,7 +42,7 @@ const threadable_styles = `
   h2,
   h3,
   h4 {
-    font-family: New Spirit;
+    font-family: "New Spirit";
     font-variant: normal;
     font-weight: 200 !important;
     line-height: 1.25em;
@@ -58,26 +58,26 @@ const threadable_styles = `
   }
 
   sup {
-    font-family: Literata;
+    font-family: "Literata";
   }
 
   a {
-    font-family: Literata;
+    font-family: "Literata";
     text-decoration-color: var(--text) !important;
     text-decoration: underline;
     word-break: break-all;
   }
 
   dt {
-    font-family: Literata;
+    font-family: "Literata";
   }
 
   tr {
-    font-family: Literata;
+    font-family: "Literata";
   }
 
   cite {
-    font-family: Literata;
+    font-family: "Literata";
     line-height: 1.4em;
   }
 
