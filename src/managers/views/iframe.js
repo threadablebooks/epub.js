@@ -141,7 +141,6 @@ class IframeView {
 	}
 
 	render(request, show) {
-
 		// view.onLayout = this.layout.format.bind(this.layout);
 		this.create();
 
@@ -380,6 +379,8 @@ class IframeView {
 
 
   load(contents) {
+	const threadableCustomStyles = '<style>body { padding: 0 !important; margin: 40px 0 !important }</style>';
+	contents = contents.replace('</title>', `</title>${threadableCustomStyles}`);
     const loading = new defer();
     const loaded = loading.promise;
 
@@ -430,7 +431,6 @@ class IframeView {
 	}
 
 	onLoad(event, promise) {
-
 		this.window = this.iframe.contentWindow;
 		this.document = this.iframe.contentDocument;
 
