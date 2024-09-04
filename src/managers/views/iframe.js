@@ -4,89 +4,47 @@ import EpubCFI from "../../epubcfi";
 import Contents from "../../contents";
 import { EVENTS } from "../../utils/constants";
 import { Pane, Highlight, Underline } from "../../utils/marks/marks";
+import fonts64 from "./fonts-64";
 
 const threadable_styles = `
+  @font-face {
+    font-family: 'Literata';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.litReg64}) format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Literata';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.litRegItal64}) format('truetype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'Maison Neue';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.maiBook64}) format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Maison Neue';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.maiBold64}) format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'New Spirit';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.newSpir64}) format('truetype');
+    font-weight: 200;
+    font-style: normal;
+  }
+
   body {
-    display: block;
     padding: 0 !important;
     margin: 40px 0 !important;
-    -webkit-font-smoothing: antialiased;
-    background: none;
-  }
-
-  .doc-content {
-    background: none;
-  }
-
-  * {
-    color: var(--text) !important;
-  }
-
-  *::selection {
-    background: rgba(153, 211, 197, 0.75);
-  }
-
-  p {
-    font-family: "Literata";
-    font-variant: normal !important;
-    line-height: 1.55em;
-    margin-bottom: 24px;
-    text-indent: 0;
-  }
-
-  b {
-    font-variant: normal !important;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-family: "New Spirit";
-    font-variant: normal;
-    font-weight: 200 !important;
-    line-height: 1.25em;
-    margin-bottom: 24px;
-    overflow: hidden;
-    text-align: center;
-    text-overflow: ellipsis;
-  }
-
-  h1 {
-    line-height: 1.15em;
-    margin-bottom: 1em;
-  }
-
-  sup {
-    font-family: "Literata";
-  }
-
-  a {
-    font-family: "Literata";
-    text-decoration-color: var(--text) !important;
-    text-decoration: underline;
-    word-break: break-all;
-  }
-
-  dt {
-    font-family: "Literata";
-  }
-
-  tr {
-    font-family: "Literata";
-  }
-
-  cite {
-    font-family: "Literata";
-    line-height: 1.4em;
-  }
-
-  img {
-    max-width: 100% !important;
-  }
-
-  .dark img {
-    background-color: #ffffff;
   }
 `;
 
