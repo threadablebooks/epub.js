@@ -4,6 +4,49 @@ import EpubCFI from "../../epubcfi";
 import Contents from "../../contents";
 import { EVENTS } from "../../utils/constants";
 import { Pane, Highlight, Underline } from "../../utils/marks/marks";
+import fonts64 from "./fonts-64";
+
+const threadable_styles = `
+  @font-face {
+    font-family: 'Literata';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.litReg64}) format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Literata';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.litRegItal64}) format('truetype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'Maison Neue';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.maiBook64}) format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Maison Neue';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.maiBold64}) format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'New Spirit';
+    src: url(data:font/truetype;charset=utf-8;base64,${fonts64.newSpir64}) format('truetype');
+    font-weight: 200;
+    font-style: normal;
+  }
+
+  body {
+    padding: 0 !important;
+    margin: 40px 0 !important;
+  }
+`;
 
 class IframeView {
 	constructor(section, options) {
@@ -141,7 +184,6 @@ class IframeView {
 	}
 
 	render(request, show) {
-
 		// view.onLayout = this.layout.format.bind(this.layout);
 		this.create();
 
@@ -380,6 +422,8 @@ class IframeView {
 
 
   load(contents) {
+	// const threadableCustomStyles = '<style>body { padding: 0 !important; margin: 40px 0 !important }</style>';
+	contents = contents.replace('</title>', `</title><style>${threadable_styles}</style>`);
     const loading = new defer();
     const loaded = loading.promise;
 
@@ -430,7 +474,6 @@ class IframeView {
 	}
 
 	onLoad(event, promise) {
-
 		this.window = this.iframe.contentWindow;
 		this.document = this.iframe.contentDocument;
 
