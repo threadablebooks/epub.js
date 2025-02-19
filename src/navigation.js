@@ -176,7 +176,7 @@ class Navigation {
 		if (!childList || childList.length === 0) return result;
 
 		// Filter for only element nodes (specifically 'li' elements)
-	    const items = Array.from(childList)
+		const items = Array.from(childList)
 			.filter(node => node.nodeType === 1 && node.nodeName.toLowerCase() === 'li');
 		if (!items || items.length === 0) return result;
 
