@@ -171,10 +171,17 @@ class Navigation {
 
 		if (!navListHtml) return result;
 		if (!navListHtml.children) return result;
-		
-		for (let i = 0; i < navListHtml.children.length; i++) {
-			const item = this.navItem(navListHtml.children[i], parent);
 
+		const childList = navListHtml.children || navListHtml.childNodes;
+		if (!childList || childList.length === 0) return result;
+
+		// Filter for only element nodes (specifically 'li' elements)
+		const items = Array.from(childList)
+			.filter(node => node.nodeType === 1 && node.nodeName.toLowerCase() === 'li');
+		if (!items || items.length === 0) return result;
+
+		for (let i = 0; i < items.length; i++) {
+			const item = this.navItem(items[i], parent);
 			if (item) {
 				result.push(item);
 			}
