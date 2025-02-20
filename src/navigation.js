@@ -170,7 +170,6 @@ class Navigation {
 		const result = [];
 
 		if (!navListHtml) return result;
-		if (!navListHtml.children) return result;
 
 		const childList = navListHtml.children || navListHtml.childNodes;
 		if (!childList || childList.length === 0) return result;
