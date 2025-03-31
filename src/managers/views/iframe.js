@@ -422,8 +422,9 @@ class IframeView {
 
 
   load(contents) {
-	// const threadableCustomStyles = '<style>body { padding: 0 !important; margin: 40px 0 !important }</style>';
-	contents = contents.replace('</title>', `</title><style>${threadable_styles}</style>`);
+	if (contents) {
+		contents = contents.replace('</title>', `</title><style>${threadable_styles}</style>`);
+	}
     const loading = new defer();
     const loaded = loading.promise;
 
